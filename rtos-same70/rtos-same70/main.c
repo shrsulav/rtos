@@ -37,7 +37,11 @@
 #include "atmel_start.h"
 #include "atmel_start_pins.h"
 #include <string.h>
-
+#include "led.h"
+#include "delay.h"
+#include "print_utility.h"
+#include "peripheral_clk_config.h"
+#include "task.h"
 static uint8_t example_hello_world[14] = "Hello World!\r\n";
 
 volatile static uint32_t data_arrived = 0;
@@ -60,6 +64,29 @@ static void err_cb_EDBG_COM(const struct usart_async_descriptor *const io_descr)
 	io_write(&EDBG_COM.io, example_hello_world, 14);
 }
 
+void task1(void)
+{
+    while(1){
+        set_led_on();
+        while (io_write(&EDBG_COM.io, "x", 1) != 1) {}
+        delay(0x0FFFFFFF);        
+    }
+}
+
+void task2(void)
+{
+    while(1)
+    {
+        set_led_off();
+        while (io_write(&EDBG_COM.io, "y", 1) != 1) {}
+        delay(0x0FFFFFF);
+    }
+}
+
+extern tcb_t g_tcbs[10];
+
+extern tcb_t *g_current_task, *g_next_task;
+
 int main(void)
 {
 	uint8_t recv_char;
@@ -71,20 +98,25 @@ int main(void)
 	usart_async_register_callback(&EDBG_COM, USART_ASYNC_ERROR_CB, err_cb_EDBG_COM);
 	usart_async_enable(&EDBG_COM);
 
-	io_write(&EDBG_COM.io, example_hello_world, 14);
+	// io_write(&EDBG_COM.io, example_hello_world, 14);
     uint8_t led_status = 0;
-	while (1) {
-		if (data_arrived == 0) {
-			continue;
-		}
-
-		while (io_read(&EDBG_COM.io, &recv_char, 1) == 1) {
-			while (io_write(&EDBG_COM.io, &recv_char, 1) != 1) {
-			}
+    
+    init_os();
+    create_task(task1);
+    create_task(task2);
+    g_tcbs[1].next_task = &g_tcbs[2];
+    g_tcbs[2].next_task = &g_tcbs[1];
+    g_current_task = &g_tcbs[1];
+    
+	SysTick_Config(CONF_HCLK_FREQUENCY/1000);
+    run_scheduler();
+    while (1) {
+        
+        led_status = (led_status+1)%2;
+        gpio_set_pin_level(LED0, led_status);
+        
+        while (io_write(&EDBG_COM.io, "a", 1) != 1) {}
             
-            led_status = (led_status+1)%2;
-            gpio_set_pin_level(LED0, led_status);
-		}
-		data_arrived = 0;
+        delay(0x0FFFFFFF);
 	}
 }
