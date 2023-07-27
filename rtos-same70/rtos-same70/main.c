@@ -39,7 +39,6 @@
 #include <string.h>
 #include "led.h"
 #include "delay.h"
-#include "print_utility.h"
 #include "peripheral_clk_config.h"
 #include "task.h"
 static uint8_t example_hello_world[14] = "Hello World!\r\n";
