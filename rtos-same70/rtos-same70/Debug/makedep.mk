@@ -4,11 +4,15 @@
 
 atmel_start.c
 
+delay.c
+
 Device_Startup\startup_same70q21b.c
 
 Device_Startup\system_same70q21b.c
 
 driver_init.c
+
+led.c
 
 main.c
 
@@ -49,4 +53,6 @@ hpl\pmc\hpl_sleep.c
 hpl\usart\hpl_usart.c
 
 hpl\xdmac\hpl_xdmac.c
+
+os\task.c
 
