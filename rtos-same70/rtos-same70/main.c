@@ -41,6 +41,7 @@
 #include "delay.h"
 #include "peripheral_clk_config.h"
 #include "task.h"
+#include "svc.h"
 static uint8_t example_hello_world[14] = "Hello World!\r\n";
 
 volatile static uint32_t data_arrived = 0;
@@ -68,7 +69,8 @@ void task1(void)
     while(1){
         set_led_on();
         while (io_write(&EDBG_COM.io, "x", 1) != 1) {}
-        delay(0x0FFFFFFF);        
+        delay(0x0FFFFFFF);  
+        task_yield();      
     }
 }
 
@@ -78,7 +80,8 @@ void task2(void)
     {
         set_led_off();
         while (io_write(&EDBG_COM.io, "y", 1) != 1) {}
-        delay(0x0FFFFFF);
+        delay(0xFFFFFFF);
+        task_yield();
     }
 }
 
@@ -101,13 +104,13 @@ int main(void)
     uint8_t led_status = 0;
     
     init_os();
-    create_task(task1);
-    create_task(task2);
-    g_tcbs[1].next_task = &g_tcbs[2];
-    g_tcbs[2].next_task = &g_tcbs[1];
-    g_current_task = &g_tcbs[1];
     
-	SysTick_Config(CONF_HCLK_FREQUENCY/1000);
+    task_create(task1);
+    task_create(task2);
+
+    g_current_task = NULL;
+    
+	// SysTick_Config(CONF_HCLK_FREQUENCY/1000);
     run_scheduler();
     while (1) {
         

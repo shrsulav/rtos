@@ -9,13 +9,12 @@
 #ifndef TASK_H_
 #define TASK_H_
 
-uint8_t create_task(void* fn_entry);
 void init_os(void);
 
 struct tcb
 {
-    uint32_t    *stack_ptr;
-    struct tcb  *next_task;
+    uint32_t    *usp;
+    uint32_t    *ksp;
     void        (*fn_entry)(void);
     uint32_t    task_id;
     bool        is_free;
