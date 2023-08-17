@@ -29,7 +29,7 @@ void k_find_next_task(void)
         t_current_tid = g_current_task->task_id;
     }
 
-    for (int32_t task_id = (t_current_tid + 1) % 4; task_id < 4 && task_id != g_current_task->task_id; task_id = (task_id + 1) % 4)
+    for (int32_t task_id = (t_current_tid + 1) % NUM_TASKS_MAX; task_id < NUM_TASKS_MAX && task_id != g_current_task->task_id; task_id = (task_id + 1) % NUM_TASKS_MAX)
     {
         if (task_id == 0)
         {
@@ -43,10 +43,13 @@ void k_find_next_task(void)
             break;
         }
     }
-
+    if(t_next_tid == -1 && g_current_task != NULL)
+    {
+        g_next_task = g_current_task;
+    }
     // scheduler could not find the next task to run
     // so, run the null task
-    if (t_next_tid == -1)
+    else if (t_next_tid == -1 && g_current_task == NULL)
     {
         g_next_task = &g_tcbs[0];
     }

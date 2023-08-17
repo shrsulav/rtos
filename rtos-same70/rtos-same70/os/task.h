@@ -9,6 +9,11 @@
 #ifndef TASK_H_
 #define TASK_H_
 
+#define NUM_TASKS_MAX           4
+#define STACK_SIZE              0x100
+#define INITIAL_xPSR            0x01000000 /* user process initial xPSR value */
+#define TCB_NOT_AVAILABLE       -1
+
 void init_os(void);
 
 struct tcb

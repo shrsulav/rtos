@@ -11,12 +11,6 @@
 
 #include "task.h"
 
-#define NUM_TASKS_MAX           4
-#define STACK_SIZE              0x100
-#define INITIAL_xPSR            0x01000000 /* user process initial xPSR value */
-#define TCB_NOT_AVAILABLE       -1
-
-
 uint32_t g_ustacks[NUM_TASKS_MAX][STACK_SIZE];
 uint32_t g_kstacks[NUM_TASKS_MAX][STACK_SIZE];
 tcb_t g_tcbs[NUM_TASKS_MAX];
