@@ -17,6 +17,6 @@
 
 __attribute__((noinline)) void run_scheduler(void);
 __attribute__((noinline)) void task_yield(void);
-__attribute__((noinline)) void task_create(int8_t (*fn_task_entry)(void));
+__attribute__((noinline)) int32_t task_create(int8_t (*fn_task_entry)(void));
 
 #endif /* SVC_H_ */

@@ -154,7 +154,6 @@ void init_os(void)
         while (1)
             ; // some error
     }
-    g_current_task = &g_tcbs[0];
 }
 
 __attribute__((naked)) void PendSV_Handler(void)

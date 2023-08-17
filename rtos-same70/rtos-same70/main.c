@@ -105,10 +105,17 @@ int main(void)
     
     init_os();
     
-    task_create(task1);
-    task_create(task2);
-
-    g_current_task = NULL;
+    int32_t tid = task_create(task1);
+    if(tid <= 0)
+    {
+        // some error
+    }
+    
+    tid = task_create(task2);
+    if(tid <= 0)
+    {
+        // some error
+    }
     
 	// SysTick_Config(CONF_HCLK_FREQUENCY/1000);
     run_scheduler();

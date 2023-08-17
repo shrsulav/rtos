@@ -13,21 +13,22 @@ void SVCall_Handler_Main(unsigned int *svc_args)
     unsigned int svc_number;
 
     svc_number = ((char *)svc_args[6])[-2];
-
+    int32_t ret = -1;
     switch(svc_number)
     {
         case SVC_RUN_SCHEDULER:
-        k_run_scheduler();
-        break;
+            k_run_scheduler();
+            break;
         case SVC_TASK_YIELD:
-        k_task_yield();
-        break;
+            k_task_yield();
+            break;
         case SVC_TASK_CREATE:
-            k_task_create(svc_args[0]);
+            ret = k_task_create(svc_args[0]);
             break;
         default:
         break;
     }
+    svc_args[0] = ret;
 }
 
 void __attribute__ (( naked )) SVCall_Handler(void)
