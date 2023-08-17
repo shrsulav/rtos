@@ -94,11 +94,10 @@ void init_tcbs(void)
         g_tcbs[task_counter].is_free = true;
         g_tcbs[task_counter].usp = g_ustacks[task_counter] + STACK_SIZE;
         g_tcbs[task_counter].ksp = g_kstacks[task_counter] + STACK_SIZE;
-        g_tcbs[task_counter].next_task = NULL;
     }
 }
 
-int8_t k_task_create(void *fn_entry)
+int8_t k_task_create(void (*fn_entry)(void))
 {
     // Disable interrupts
 
@@ -168,16 +167,15 @@ __attribute__((naked)) void PendSV_Handler(void)
 {
     __asm volatile(
         "LDR R0, =g_current_task                \n"
-        "LDR R1, [R0]                           \n"
+        "LDR R1, [R0]                           \n" // R1 points to the TCB
         "CBZ R1, LOAD_CONTEXT                   \n"
 
         "SAVE_CONTEXT:                          \n"
-        "PUSH {R4-R11}                          \n"
-        "LDR R1, [R0]                           \n"
-        "MRS R2, PSP                            \n"
-        "STR R2, [R1]                           \n"
-        "MRS R2, MSP                            \n"
-        "STR R2, [R1,4]                         \n"
+        "PUSH {R4-R11}                          \n" // Push R4-R11 onto MSP
+        "MRS R2, PSP                            \n" 
+        "STR R2, [R1]                           \n" // update usp in the TCB
+        "MRS R2, MSP                            \n" 
+        "STR R2, [R1,4]                         \n" // update ksp in the TCB
 
         "LOAD_CONTEXT:                          \n"
         "LDR R1, =g_next_task                   \n"
@@ -187,7 +185,7 @@ __attribute__((naked)) void PendSV_Handler(void)
         "LDR R4, [R2, #4]                       \n" // R4 points to g_next_task->ksp
         "MSR MSP, R4                            \n"
         "POP {R4-R11}                           \n"
-        "STR R2, [R0]                           \n"
-        "MVN R0, #2                             \n"
-        "BX  R0                                 \n");
+        "STR R2, [R0]                           \n" // update g_current_task to be same as g_next_task
+        "MVN LR, #2                             \n" // load 0xFFFFFFFD onto LR
+        "BX  LR                                 \n");
 }
