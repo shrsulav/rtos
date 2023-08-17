@@ -9,13 +9,17 @@
 #ifndef TASK_H_
 #define TASK_H_
 
-uint8_t create_task(void* fn_entry);
+#define NUM_TASKS_MAX           4
+#define STACK_SIZE              0x100
+#define INITIAL_xPSR            0x01000000 /* user process initial xPSR value */
+#define TCB_NOT_AVAILABLE       -1
+
 void init_os(void);
 
 struct tcb
 {
-    uint32_t    *stack_ptr;
-    struct tcb  *next_task;
+    uint32_t    *usp;
+    uint32_t    *ksp;
     void        (*fn_entry)(void);
     uint32_t    task_id;
     bool        is_free;

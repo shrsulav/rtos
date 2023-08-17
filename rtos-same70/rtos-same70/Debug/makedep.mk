@@ -54,5 +54,11 @@ hpl\usart\hpl_usart.c
 
 hpl\xdmac\hpl_xdmac.c
 
+os\svc.c
+
+os\handler_misc.c
+
+os\syscalls.c
+
 os\task.c
 
